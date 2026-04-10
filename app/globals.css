@@ -32,6 +32,12 @@ body {
   background: #c0bdb8;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ── Textarea placeholder styling ── */
 #job-desc::placeholder {
   color: #777169;

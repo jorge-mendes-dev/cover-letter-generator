@@ -25,7 +25,7 @@ export default function Home() {
               marginBottom: "32px",
             }}
           >
-            AI-Powered · Groq llama-3.3-70b
+            AI-Powered
           </p>
 
           {/* Display headline — Cormorant Garamond 300, whisper-thin */}
@@ -97,7 +97,15 @@ export default function Home() {
             letterSpacing: "0.14px",
           }}
         >
-          Powered by Groq · llama-3.3-70b-versatile
+          Powered by AI. - Built by{" "}
+          <a
+            href="https://jorgemendes.com.br/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#000000", textDecoration: "underline" }}
+          >
+            Jorge Mendes
+          </a>
         </p>
       </footer>
     </div>
