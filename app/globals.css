@@ -5,13 +5,220 @@
   --font-mono: var(--font-mono);
 }
 
+/* ── Light theme (default) ── */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-warm: rgba(245, 242, 239, 0.8);
+  --result-bg: #f5f5f5;
+
+  /* Typography */
+  --ink: #000000;
+  --ink-secondary: #4e4e4e;
+  --ink-muted: #777169;
+
+  /* Borders */
+  --border: #e5e5e5;
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-focus: rgba(0, 0, 0, 0.15);
+
+  /* Shadows */
+  --shadow-outline: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.04) 0px 1px 2px, rgba(0, 0, 0, 0.04) 0px 2px 4px;
+  --shadow-inset: rgba(0, 0, 0, 0.075) 0px 0px 0px 0.5px inset;
+  --shadow-warm: rgba(0, 0, 0, 0.1) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px,
+    rgba(78, 50, 23, 0.04) 0px 6px 16px;
+  --shadow-button: rgba(0, 0, 0, 0.4) 0px 0px 1px,
+    rgba(0, 0, 0, 0.04) 0px 4px 4px;
+  --shadow-button-hover: rgba(0, 0, 0, 0.5) 0px 0px 1px,
+    rgba(0, 0, 0, 0.06) 0px 4px 8px;
+  --shadow-card: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.04) 0px 2px 4px, rgba(0, 0, 0, 0.04) 0px 8px 24px;
+  --shadow-input-focus: rgba(0, 0, 0, 0.1) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+
+  /* Buttons */
+  --btn-primary-bg: #000000;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #222222;
+  --btn-primary-disabled: #555555;
+
+  /* Errors */
+  --error-bg: rgba(200, 60, 40, 0.04);
+  --error-border: rgba(200, 60, 40, 0.15);
+  --error-text: #b33020;
+
+  /* Upload */
+  --upload-icon-stroke: #d0cdc8;
+}
+
+/* ── OS dark preference (no JS needed, prevents FOUC before hydration) ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Surfaces */
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface-warm: rgba(32, 28, 24, 0.85);
+    --result-bg: #111111;
+
+    /* Typography */
+    --ink: #f0ede8;
+    --ink-secondary: #a8a59f;
+    --ink-muted: #6b6760;
+
+    /* Borders */
+    --border: #2e2e2e;
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-focus: rgba(255, 255, 255, 0.15);
+
+    /* Shadows */
+    --shadow-outline: rgba(255, 255, 255, 0.05) 0px 0px 0px 1px,
+      rgba(0, 0, 0, 0.5) 0px 1px 2px, rgba(0, 0, 0, 0.3) 0px 2px 4px;
+    --shadow-inset: rgba(0, 0, 0, 0.4) 0px 0px 0px 0.5px inset;
+    --shadow-warm: rgba(0, 0, 0, 0.4) 0px 0px 0px 0.5px inset,
+      rgba(255, 255, 255, 0.04) 0px 0px 0px 1px,
+      rgba(120, 90, 50, 0.08) 0px 6px 16px;
+    --shadow-button: rgba(255, 255, 255, 0.1) 0px 0px 1px,
+      rgba(0, 0, 0, 0.3) 0px 4px 4px;
+    --shadow-button-hover: rgba(255, 255, 255, 0.14) 0px 0px 1px,
+      rgba(0, 0, 0, 0.4) 0px 4px 8px;
+    --shadow-card: rgba(255, 255, 255, 0.04) 0px 0px 0px 1px,
+      rgba(0, 0, 0, 0.5) 0px 2px 4px, rgba(0, 0, 0, 0.4) 0px 8px 24px;
+    --shadow-input-focus: rgba(255, 255, 255, 0.08) 0px 0px 0px 0.5px inset,
+      rgba(255, 255, 255, 0.08) 0px 0px 0px 1px;
+
+    /* Buttons */
+    --btn-primary-bg: #f0ede8;
+    --btn-primary-text: #0d0d0d;
+    --btn-primary-hover: #dedad4;
+    --btn-primary-disabled: #888888;
+
+    /* Errors */
+    --error-bg: rgba(200, 60, 40, 0.08);
+    --error-border: rgba(200, 60, 40, 0.25);
+    --error-text: #e07060;
+
+    /* Upload */
+    --upload-icon-stroke: #4a4642;
+  }
+}
+
+/* Explicit light override — beats the media query above */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-warm: rgba(245, 242, 239, 0.8);
+  --result-bg: #f5f5f5;
+
+  /* Typography */
+  --ink: #000000;
+  --ink-secondary: #4e4e4e;
+  --ink-muted: #777169;
+
+  /* Borders */
+  --border: #e5e5e5;
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-focus: rgba(0, 0, 0, 0.15);
+
+  /* Shadows */
+  --shadow-outline: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.04) 0px 1px 2px, rgba(0, 0, 0, 0.04) 0px 2px 4px;
+  --shadow-inset: rgba(0, 0, 0, 0.075) 0px 0px 0px 0.5px inset;
+  --shadow-warm: rgba(0, 0, 0, 0.1) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px,
+    rgba(78, 50, 23, 0.04) 0px 6px 16px;
+  --shadow-button: rgba(0, 0, 0, 0.4) 0px 0px 1px,
+    rgba(0, 0, 0, 0.04) 0px 4px 4px;
+  --shadow-button-hover: rgba(0, 0, 0, 0.5) 0px 0px 1px,
+    rgba(0, 0, 0, 0.06) 0px 4px 8px;
+  --shadow-card: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.04) 0px 2px 4px, rgba(0, 0, 0, 0.04) 0px 8px 24px;
+  --shadow-input-focus: rgba(0, 0, 0, 0.1) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+
+  /* Buttons */
+  --btn-primary-bg: #000000;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #222222;
+  --btn-primary-disabled: #555555;
+
+  /* Errors */
+  --error-bg: rgba(200, 60, 40, 0.04);
+  --error-border: rgba(200, 60, 40, 0.15);
+  --error-text: #b33020;
+
+  /* Upload */
+  --upload-icon-stroke: #d0cdc8;
+}
+
+/* ── Dark theme ── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface-warm: rgba(32, 28, 24, 0.85);
+  --result-bg: #111111;
+
+  /* Typography */
+  --ink: #f0ede8;
+  --ink-secondary: #a8a59f;
+  --ink-muted: #6b6760;
+
+  /* Borders */
+  --border: #2e2e2e;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(255, 255, 255, 0.15);
+
+  /* Shadows */
+  --shadow-outline: rgba(255, 255, 255, 0.05) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.5) 0px 1px 2px, rgba(0, 0, 0, 0.3) 0px 2px 4px;
+  --shadow-inset: rgba(0, 0, 0, 0.4) 0px 0px 0px 0.5px inset;
+  --shadow-warm: rgba(0, 0, 0, 0.4) 0px 0px 0px 0.5px inset,
+    rgba(255, 255, 255, 0.04) 0px 0px 0px 1px,
+    rgba(120, 90, 50, 0.08) 0px 6px 16px;
+  --shadow-button: rgba(255, 255, 255, 0.1) 0px 0px 1px,
+    rgba(0, 0, 0, 0.3) 0px 4px 4px;
+  --shadow-button-hover: rgba(255, 255, 255, 0.14) 0px 0px 1px,
+    rgba(0, 0, 0, 0.4) 0px 4px 8px;
+  --shadow-card: rgba(255, 255, 255, 0.04) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.5) 0px 2px 4px, rgba(0, 0, 0, 0.4) 0px 8px 24px;
+  --shadow-input-focus: rgba(255, 255, 255, 0.08) 0px 0px 0px 0.5px inset,
+    rgba(255, 255, 255, 0.08) 0px 0px 0px 1px;
+
+  /* Buttons */
+  --btn-primary-bg: #f0ede8;
+  --btn-primary-text: #0d0d0d;
+  --btn-primary-hover: #dedad4;
+  --btn-primary-disabled: #888888;
+
+  /* Errors */
+  --error-bg: rgba(200, 60, 40, 0.08);
+  --error-border: rgba(200, 60, 40, 0.25);
+  --error-text: #e07060;
+
+  /* Upload */
+  --upload-icon-stroke: #4a4642;
+}
+
 html {
   scroll-behavior: smooth;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body {
-  background-color: #f5f5f5;
-  color: #000000;
+  background-color: var(--bg);
+  color: var(--ink);
   font-family: var(--font-inter), system-ui, sans-serif;
   letter-spacing: 0.16px;
   -webkit-font-smoothing: antialiased;
@@ -22,30 +229,28 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d8d5d0;
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c0bdb8;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  background: var(--ink-muted);
 }
 
 /* ── Textarea placeholder styling ── */
 #job-desc::placeholder {
-  color: #777169;
+  color: var(--ink-muted);
   letter-spacing: 0.14px;
 }
 
 /* ── Spinner animation ── */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

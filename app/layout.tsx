@@ -1,7 +1,9 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
 import QueryProvider from "@/components/QueryProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 // Closest Google Fonts match to Waldenburg weight 300 — whisper-thin, ethereal display serif
@@ -40,17 +42,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${cormorant.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
+      <head>
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
+      </head>
       <body
         style={{
           WebkitFontSmoothing: "antialiased",
           MozOsxFontSmoothing: "grayscale",
         }}
       >
-        <QueryProvider>
-          <ErrorBoundary>{children}</ErrorBoundary>
-        </QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <ErrorBoundary>{children}</ErrorBoundary>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

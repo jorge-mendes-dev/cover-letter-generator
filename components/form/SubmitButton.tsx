@@ -13,8 +13,10 @@ export default function SubmitButton({ loading }: Props) {
       disabled={loading}
       style={{
         width: "100%",
-        background: loading ? "#555" : "#000000",
-        color: "#ffffff",
+        background: loading
+          ? "var(--btn-primary-disabled)"
+          : "var(--btn-primary-bg)",
+        color: "var(--btn-primary-text)",
         borderRadius: "9999px",
         padding: "14px 32px",
         fontSize: "15px",
@@ -30,10 +32,12 @@ export default function SubmitButton({ loading }: Props) {
         gap: "10px",
       }}
       onMouseEnter={(e) => {
-        if (!loading) e.currentTarget.style.background = "#222";
+        if (!loading)
+          e.currentTarget.style.background = "var(--btn-primary-hover)";
       }}
       onMouseLeave={(e) => {
-        if (!loading) e.currentTarget.style.background = "#000";
+        if (!loading)
+          e.currentTarget.style.background = "var(--btn-primary-bg)";
       }}
     >
       {loading ? (

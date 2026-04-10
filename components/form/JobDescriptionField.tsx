@@ -17,7 +17,7 @@ export default function JobDescriptionField({ value, onChange }: Props) {
           fontFamily: FONT_INTER,
           fontSize: "12px",
           fontWeight: 500,
-          color: "#777169",
+          color: "var(--ink-muted)",
           letterSpacing: "0.14px",
           marginBottom: "10px",
         }}
@@ -32,14 +32,14 @@ export default function JobDescriptionField({ value, onChange }: Props) {
         rows={12}
         style={{
           width: "100%",
-          background: "#ffffff",
-          border: "1px solid #e5e5e5",
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
           boxShadow: SHADOW_INSET,
           borderRadius: "12px",
           padding: "16px 20px",
           fontSize: "15px",
           fontFamily: FONT_INTER,
-          color: "#000000",
+          color: "var(--ink)",
           lineHeight: 1.6,
           letterSpacing: "0.16px",
           resize: "vertical",
@@ -48,13 +48,12 @@ export default function JobDescriptionField({ value, onChange }: Props) {
           boxSizing: "border-box",
         }}
         onFocus={(e) => {
-          e.currentTarget.style.boxShadow =
-            "rgba(0,0,0,0.1) 0px 0px 0px 0.5px inset, rgba(0,0,0,0.1) 0px 0px 0px 1px";
-          e.currentTarget.style.borderColor = "rgba(0,0,0,0.15)";
+          e.currentTarget.style.boxShadow = "var(--shadow-input-focus)";
+          e.currentTarget.style.borderColor = "var(--border-focus)";
         }}
         onBlur={(e) => {
           e.currentTarget.style.boxShadow = SHADOW_INSET;
-          e.currentTarget.style.borderColor = "#e5e5e5";
+          e.currentTarget.style.borderColor = "var(--border)";
         }}
       />
     </div>

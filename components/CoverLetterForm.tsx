@@ -86,13 +86,17 @@ export default function CoverLetterForm() {
           onFileReset={() => {
             setFile(null);
             setValidationError(null);
+            reset();
           }}
           onError={setValidationError}
         />
 
         <JobDescriptionField
           value={jobDescription}
-          onChange={setJobDescription}
+          onChange={(v) => {
+            setJobDescription(v);
+            if (!v.trim()) reset();
+          }}
         />
 
         {error && <ErrorBanner message={error} />}

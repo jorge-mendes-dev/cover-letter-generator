@@ -39,7 +39,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       <div
         style={{
           minHeight: "100vh",
-          background: "#f5f5f5",
+          background: "var(--bg)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -48,7 +48,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       >
         <div
           style={{
-            background: "#ffffff",
+            background: "var(--surface)",
             borderRadius: "20px",
             boxShadow: SHADOW_OUTLINE,
             padding: "48px 40px",
@@ -75,11 +75,12 @@ export default class ErrorBoundary extends Component<Props, State> {
               height="22"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#000"
+              stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"
+              style={{ color: "var(--ink)" }}
             >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
@@ -94,7 +95,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               fontSize: "36px",
               fontWeight: 300,
               letterSpacing: "-0.5px",
-              color: "#000000",
+              color: "var(--ink)",
               lineHeight: 1.1,
               marginBottom: "12px",
             }}
@@ -108,9 +109,9 @@ export default class ErrorBoundary extends Component<Props, State> {
               style={{
                 fontFamily: FONT_MONO,
                 fontSize: "12px",
-                color: "#777169",
-                background: "rgba(0,0,0,0.03)",
-                border: "1px solid rgba(0,0,0,0.06)",
+                color: "var(--ink-muted)",
+                background: "var(--border-subtle)",
+                border: "1px solid var(--border-subtle)",
                 borderRadius: "8px",
                 padding: "10px 14px",
                 marginBottom: "32px",
@@ -128,7 +129,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               fontFamily: FONT_INTER,
               fontSize: "14px",
               fontWeight: 400,
-              color: "#4e4e4e",
+              color: "var(--ink-secondary)",
               letterSpacing: "0.14px",
               lineHeight: 1.6,
               marginBottom: "32px",
@@ -149,8 +150,8 @@ export default class ErrorBoundary extends Component<Props, State> {
                 fontSize: "14px",
                 fontWeight: 500,
                 letterSpacing: "0.14px",
-                color: "#ffffff",
-                background: "#000000",
+                color: "var(--btn-primary-text)",
+                background: "var(--btn-primary-bg)",
                 border: "none",
                 borderRadius: "9999px",
                 padding: "10px 24px",
@@ -167,14 +168,13 @@ export default class ErrorBoundary extends Component<Props, State> {
                 fontSize: "13px",
                 fontWeight: 500,
                 letterSpacing: "0.14px",
-                color: "#000000",
-                background: "#ffffff",
+                color: "var(--ink)",
+                background: "var(--surface)",
                 border: "none",
                 borderRadius: "9999px",
                 padding: "10px 22px",
                 cursor: "pointer",
-                boxShadow:
-                  "rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px",
+                boxShadow: "var(--shadow-button)",
               }}
             >
               Reload page

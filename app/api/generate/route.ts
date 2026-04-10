@@ -113,26 +113,35 @@ async function extractTextFromPdf(file: File): Promise<string | NextResponse> {
 
   // Truncate to stay within model token limits
   return rawText.length > MAX_RESUME_CHARS
-    ? rawText.slice(0, MAX_RESUME_CHARS) + "\n[resume truncated for length]"
+    ? rawText.slice(0, MAX_RESUME_CHARS) +
+        "\n\n[Note: The resume above was truncated due to length. Only use the information visible above.]"
     : rawText;
 }
 
 // ── Step 3: Build the prompt that goes to the model ────────────────────────
 function buildPrompt(resumeText: string, jobDescription: string) {
-  const system = `You are an expert professional resume writer and career coach who specialises in tailored cover letters.
+  const system = `You are an experienced resume writer and career coach who specializes in writing strong, tailored, and natural-sounding cover letters.
 
-Your task: write a compelling, specific cover letter body based on the applicant's resume and the provided job description.
+Write a compelling cover letter based on the candidate’s resume and the job description provided. Aim for approximately 250–350 words total across 3–4 paragraphs.
 
-Requirements:
-- Exactly 3–4 paragraphs of body text.
-- Paragraph 1 (Hook): open with genuine enthusiasm for the specific role; name the company or role explicitly if identifiable from the job description.
-- Paragraphs 2–3 (Evidence): select 2–3 concrete achievements or skills from the resume that directly match the job's requirements — include numbers, technologies, or measurable outcomes wherever possible.
-- Paragraph 4 (Close): reinforce the candidate's fit and invite next steps.
-- Tone: confident and direct — never start with "I am writing to apply" or "I believe I would be a great fit".
-- Language: detect the language of the job description and write the entire cover letter in that same language. If the job description is in Portuguese, write in Portuguese. If in English, write in English. Match the language exactly.
-- Do NOT use placeholder brackets such as [Company Name] or [Your Name] — infer from context or omit gracefully.
-- Do NOT include greeting (Dear …), date, address header, or sign-off (Sincerely, …) — body paragraphs only.
-- Output plain prose paragraphs separated by a blank line; no bullet points, no headers.`;
+Only use information present in the resume. Do not invent skills, achievements, technologies, companies, or metrics that are not explicitly stated.
+
+Start with a strong, specific opening that shows genuine interest in the role. Mention the company, product, or domain when possible, and connect it to something meaningful (such as scale, technical challenges, or impact). Avoid generic openings like “I’m thrilled to apply”.
+
+In the next 1–2 paragraphs, highlight 2–3 relevant experiences that match the job requirements. For each example:
+1. Clearly describe the action taken, the technologies used, and the impact or result (prefer measurable outcomes like performance, scalability, or efficiency improvements).
+2. Reflect the seniority level evident in the resume — do not over-claim ownership, architectural decisions, or cross-team leadership that is not supported by the resume text.
+3. Do not simply repeat the resume — focus on what is most relevant for this role.
+
+If the job description mentions AI, automation, or innovation, incorporate relevant experience or demonstrated interest in those areas in a natural way.
+
+Finish with a confident, forward-looking closing that reinforces the candidate’s fit and interest in contributing. Avoid generic phrases like “I look forward to hearing from you”.
+
+Write in the same language as the job description.
+
+Do not include greetings, sign-offs, or placeholders like [Company Name]. Output only plain paragraphs separated by a blank line. No bullet points or headers.
+
+Write in a natural, human tone. Avoid robotic phrasing, clichés, or overly formal language.`;
 
   const prompt = `RESUME:\n${resumeText}\n\nJOB DESCRIPTION:\n${jobDescription}`;
 
@@ -168,7 +177,7 @@ async function generateCoverLetter(
 export async function POST(req: NextRequest) {
   // Reject oversized requests before buffering the body
   const contentLength = req.headers.get("content-length");
-  if (contentLength && parseInt(contentLength) > MAX_FILE_BYTES + 4096) {
+  if (contentLength && parseInt(contentLength, 10) > MAX_FILE_BYTES + 4096) {
     return NextResponse.json({ error: "Request too large." }, { status: 413 });
   }
 

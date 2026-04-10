@@ -27,7 +27,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
       style={{
         marginTop: "40px",
         paddingTop: "36px",
-        borderTop: "1px solid rgba(0,0,0,0.06)",
+        borderTop: "1px solid var(--border-subtle)",
       }}
     >
       {/* Header row */}
@@ -45,7 +45,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
             fontSize: "28px",
             fontWeight: 300,
             letterSpacing: "-0.2px",
-            color: "#000000",
+            color: "var(--ink)",
             lineHeight: 1.2,
             margin: 0,
           }}
@@ -62,24 +62,21 @@ export default function CoverLetterResult({ coverLetter }: Props) {
             gap: "7px",
             padding: "8px 16px",
             borderRadius: "9999px",
-            background: "#ffffff",
-            boxShadow:
-              "rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px",
+            background: "var(--surface)",
+            boxShadow: "var(--shadow-button)",
             border: "none",
             cursor: "pointer",
             fontFamily: FONT_INTER,
             fontSize: "13px",
             fontWeight: 500,
-            color: copied ? "#000000" : "#4e4e4e",
+            color: copied ? "var(--ink)" : "var(--ink-secondary)",
             transition: "all 0.15s ease",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow =
-              "rgba(0,0,0,0.5) 0px 0px 1px, rgba(0,0,0,0.06) 0px 4px 8px";
+            e.currentTarget.style.boxShadow = "var(--shadow-button-hover)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow =
-              "rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px";
+            e.currentTarget.style.boxShadow = "var(--shadow-button)";
           }}
         >
           {copied ? (
@@ -125,7 +122,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
           style={{
             fontFamily: FONT_INTER,
             fontSize: "12px",
-            color: "#b33020",
+            color: "var(--error-text)",
             textAlign: "right",
             margin: "0 0 12px",
           }}
@@ -137,9 +134,9 @@ export default function CoverLetterResult({ coverLetter }: Props) {
       {/* Letter body */}
       <div
         style={{
-          background: "#f5f5f5",
+          background: "var(--result-bg)",
           borderRadius: "12px",
-          boxShadow: "rgba(0,0,0,0.06) 0px 0px 0px 1px",
+          boxShadow: "var(--shadow-outline)",
           padding: "28px 32px",
         }}
       >
@@ -148,7 +145,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
             fontFamily: FONT_MONO,
             fontSize: "13.5px",
             lineHeight: 1.85,
-            color: "#000000",
+            color: "var(--ink)",
             whiteSpace: "pre-wrap",
             margin: 0,
             letterSpacing: 0,

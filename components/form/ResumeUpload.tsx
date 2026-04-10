@@ -60,7 +60,7 @@ export default function ResumeUpload({
           fontFamily: FONT_INTER,
           fontSize: "12px",
           fontWeight: 500,
-          color: "#777169",
+          color: "var(--ink-muted)",
           letterSpacing: "0.14px",
           marginBottom: "10px",
         }}
@@ -88,7 +88,7 @@ export default function ResumeUpload({
           if (dragCounter.current === 0) setIsDragging(false);
         }}
         style={{
-          background: file || isDragging ? WARM_STONE : "#ffffff",
+          background: file || isDragging ? WARM_STONE : "var(--surface)",
           borderRadius: "16px",
           boxShadow:
             file || isDragging
@@ -115,8 +115,9 @@ export default function ResumeUpload({
               height="16"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#000"
+              stroke="currentColor"
               strokeWidth="2.5"
+              style={{ color: "var(--ink)" }}
             >
               <path
                 d="M20 6L9 17l-5-5"
@@ -129,7 +130,7 @@ export default function ResumeUpload({
                 fontFamily: FONT_INTER,
                 fontSize: "14px",
                 fontWeight: 500,
-                color: "#000000",
+                color: "var(--ink)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -143,15 +144,17 @@ export default function ResumeUpload({
               onClick={handleReset}
               aria-label="Remove file"
               style={{
-                color: "#777169",
+                color: "var(--ink-muted)",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
                 display: "flex",
                 padding: "2px",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#000")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#777169")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "var(--ink-muted)")
+              }
             >
               <svg
                 width="14"
@@ -179,7 +182,7 @@ export default function ResumeUpload({
               height="28"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#d0cdc8"
+              stroke="var(--upload-icon-stroke)"
               strokeWidth="1.5"
             >
               <path
@@ -197,7 +200,7 @@ export default function ResumeUpload({
               style={{
                 fontFamily: FONT_INTER,
                 fontSize: "14px",
-                color: "#4e4e4e",
+                color: "var(--ink-secondary)",
                 letterSpacing: "0.14px",
                 margin: 0,
               }}
@@ -205,7 +208,7 @@ export default function ResumeUpload({
               Drop your PDF here, or{" "}
               <span
                 style={{
-                  color: "#000000",
+                  color: "var(--ink)",
                   textDecoration: "underline",
                   textUnderlineOffset: "3px",
                 }}
