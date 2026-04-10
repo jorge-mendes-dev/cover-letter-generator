@@ -1,4 +1,4 @@
-import { mkdirSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
 import { createRequire } from 'module';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -11,7 +11,6 @@ const iconsDir = join(__dirname, '..', 'public', 'icons');
 mkdirSync(iconsDir, { recursive: true });
 
 function makeSvg(size) {
-  const pad = Math.round(size * 0.18);
   const docW = Math.round(size * 0.52);
   const docH = Math.round(size * 0.62);
   const docX = Math.round((size - docW) / 2);
@@ -95,10 +94,7 @@ function makeFaviconSvg(size) {
 </svg>`;
 }
 
-// Write app/icon.svg (Next.js App Router picks this up automatically)
-import { writeFileSync } from 'fs';
-const svgContent = makeFaviconSvg(32).replace('width="32" height="32"', 'width="32" height="32"');
-// Scale-independent SVG for the icon file
+// Scale-independent SVG for the icon file (Next.js App Router picks up app/icon.svg automatically)
 const scalableSvg = `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
   <rect width="32" height="32" rx="7" fill="#000000"/>
   <rect x="9" y="7" width="14" height="18" rx="2" fill="#ffffff"/>
