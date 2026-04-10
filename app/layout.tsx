@@ -1,4 +1,5 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
+import QueryProvider from "@/components/QueryProvider";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -47,7 +48,9 @@ export default function RootLayout({
           MozOsxFontSmoothing: "grayscale",
         }}
       >
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <QueryProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import CoverLetterResult from "./form/CoverLetterResult";
 import ErrorBanner from "./form/ErrorBanner";
@@ -7,14 +8,38 @@ import JobDescriptionField from "./form/JobDescriptionField";
 import ResumeUpload from "./form/ResumeUpload";
 import SubmitButton from "./form/SubmitButton";
 
+async function generateCoverLetter(formData: FormData): Promise<string> {
+  const res = await fetch("/api/generate", { method: "POST", body: formData });
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.error ?? "Something went wrong. Please try again.");
+  return data.coverLetter as string;
+}
+
 export default function CoverLetterForm() {
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [coverLetter, setCoverLetter] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const resultRef = useRef<HTMLDivElement>(null);
+
+  const {
+    mutate,
+    isPending,
+    data: coverLetter,
+    error: mutationError,
+    reset,
+  } = useMutation({
+    mutationFn: generateCoverLetter,
+  });
+
+  const error =
+    validationError ??
+    (mutationError instanceof Error
+      ? mutationError.message
+      : mutationError
+        ? "Something went wrong. Please try again."
+        : null);
 
   useEffect(() => {
     if (coverLetter) {
@@ -27,38 +52,22 @@ export default function CoverLetterForm() {
     }
   }, [coverLetter]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      setError("Please upload your resume as a PDF.");
+      setValidationError("Please upload your resume as a PDF.");
       return;
     }
     if (!jobDescription.trim()) {
-      setError("Please paste the job description.");
+      setValidationError("Please paste the job description.");
       return;
     }
-
-    setLoading(true);
-    setError(null);
-    setCoverLetter(null);
-
+    setValidationError(null);
+    reset();
     const body = new FormData();
     body.append("resume", file);
     body.append("jobDescription", jobDescription.trim());
-
-    try {
-      const res = await fetch("/api/generate", { method: "POST", body });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Something went wrong. Please try again.");
-      } else {
-        setCoverLetter(data.coverLetter);
-      }
-    } catch {
-      setError("Network error. Please check your connection and try again.");
-    } finally {
-      setLoading(false);
-    }
+    mutate(body);
   };
 
   return (
@@ -72,13 +81,13 @@ export default function CoverLetterForm() {
           file={file}
           onFileAccepted={(f) => {
             setFile(f);
-            setError(null);
+            setValidationError(null);
           }}
           onFileReset={() => {
             setFile(null);
-            setError(null);
+            setValidationError(null);
           }}
-          onError={setError}
+          onError={setValidationError}
         />
 
         <JobDescriptionField
@@ -88,7 +97,7 @@ export default function CoverLetterForm() {
 
         {error && <ErrorBanner message={error} />}
 
-        <SubmitButton loading={loading} />
+        <SubmitButton loading={isPending} />
       </form>
 
       {coverLetter && (
