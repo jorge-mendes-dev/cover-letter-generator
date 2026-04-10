@@ -5,12 +5,17 @@ import { z } from "zod";
 
 // pdf-parse v2 ships a class-based API; require() resolves the CJS build.
 // LoadParameters uses `data: TypedArray | ArrayBuffer` (not `buffer`).
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PDFParse } = require("pdf-parse") as {
-  PDFParse: new (opts: { data?: ArrayBuffer | Uint8Array; url?: string }) => {
-    getText: () => Promise<{ text: string }>;
-  };
+type PDFParseConstructor = new (opts: { data?: ArrayBuffer | Uint8Array; url?: string }) => {
+  getText: () => Promise<{ text: string }>;
 };
+
+let PDFParse: PDFParseConstructor | undefined;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  ({ PDFParse } = require("pdf-parse") as { PDFParse: PDFParseConstructor });
+} catch (err) {
+  console.error("[module load] pdf-parse failed to load:", err);
+}
 
 // Node.js native fetch (undici) does NOT honour NODE_TLS_REJECT_UNAUTHORIZED at
 // runtime — it must be applied via a custom global dispatcher. This activates
@@ -82,6 +87,12 @@ async function parseFormData(
 
 // ── Step 2: Extract plain text from the PDF buffer ─────────────────────────
 async function extractTextFromPdf(file: File): Promise<string | NextResponse> {
+  if (!PDFParse) {
+    return NextResponse.json(
+      { error: "PDF parsing is unavailable. Please try again later." },
+      { status: 500 }
+    );
+  }
   let rawText: string;
   try {
     const arrayBuffer = await file.arrayBuffer();
