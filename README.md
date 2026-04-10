@@ -1,36 +1,131 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cover Letter Generator
+
+Upload your PDF résumé and paste a job description — get a tailored, AI-generated cover letter in seconds.
+
+Built with **Next.js 16**, **React 19**, and **Groq's `llama-3.3-70b-versatile`** model via the Vercel AI SDK.
+
+---
+
+## Features
+
+- **PDF résumé parsing** — server-side text extraction via `pdf-parse` (text-based PDFs only)
+- **AI-generated cover letters** — structured output with Zod validation; no hallucinated placeholders
+- **ElevenLabs-inspired UI** — Cormorant Garamond display type, Inter body, soft light palette
+- **Error boundary** — catches unexpected render errors with a graceful fallback UI
+- **Input validation** — PDF type/size checks (≤ 5 MB), non-empty job description required
+
+---
+
+## Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 16.2 (App Router) |
+| UI | React 19 · TypeScript · Tailwind CSS v4 |
+| AI | Vercel AI SDK v6 · `@ai-sdk/groq` · `llama-3.3-70b-versatile` |
+| PDF parsing | `pdf-parse` v2 (Node.js runtime) |
+| Validation | Zod v4 |
+
+---
+
+## Project Structure
+
+```
+app/
+  layout.tsx              — fonts + root ErrorBoundary
+  globals.css             — Tailwind import + base styles
+  page.tsx                — landing page (server component)
+  api/
+    generate/
+      route.ts            — POST handler: PDF → prompt → AI → JSON
+components/
+  CoverLetterForm.tsx     — client form: upload, textarea, submit, result
+  ErrorBoundary.tsx       — class-based React error boundary
+  form/
+    CoverLetterResult.tsx — rendered cover letter output
+    ErrorBanner.tsx       — inline API error display
+    JobDescriptionField.tsx
+    ResumeUpload.tsx
+    SubmitButton.tsx
+    tokens.ts             — shared design tokens (colors, shadows, fonts)
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- A [Groq API key](https://console.groq.com)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file in the project root:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
-## Learn More
+> The API key is only read server-side and never exposed to the client.
 
-To learn more about Next.js, take a look at the following resources:
+### Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev        # http://localhost:3000
+npm run dev:f      # http://localhost:4000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Build & Start
 
-## Deploy on Vercel
+```bash
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Route
+
+`POST /api/generate` — accepts `multipart/form-data`:
+
+| Field | Type | Constraint |
+|---|---|---|
+| `resume` | `File` (PDF) | ≤ 5 MB, text-based |
+| `jobDescription` | `string` | Non-empty |
+
+**Response** `200 OK`:
+
+```json
+{ "coverLetter": "..." }
+```
+
+**Error responses**: `400` (invalid input), `422` (PDF parse failure), `500` (server/AI error).
+
+The route runs on the **Node.js runtime** (not Edge) because `pdf-parse` requires Node.js APIs. Resume text is truncated to 8 000 characters before being sent to the model.
+
+---
+
+## Corporate Proxy / TLS
+
+If you are behind a corporate proxy with a custom root CA, set:
+
+```env
+NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
+The app detects this flag and configures `undici`'s global dispatcher accordingly.
+
+---
+
+## Deployment
+
+Deploy to [Vercel](https://vercel.com) with zero configuration — just add `GROQ_API_KEY` as an environment variable in your project settings.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
