@@ -4,8 +4,3 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[functions]
-  # Free tier max is 10s; Pro allows up to 26s.
-  # PDF parsing + LLM generation can take 10–20s — increase if on Pro.
-  timeout = 26
