@@ -1,5 +1,6 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
 import QueryProvider from "@/components/QueryProvider";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
@@ -32,6 +33,22 @@ export const metadata: Metadata = {
   title: "Cover Letter Generator",
   description:
     "Upload your resume and paste the job description. Get a tailored cover letter in seconds.",
+  appleWebApp: {
+    capable: true,
+    title: "Cover Letter Generator",
+    statusBarStyle: "default",
+  },
+  formatDetection: { telephone: false },
+  icons: {
+    apple: "/icons/icon-192x192.png",
+  },
+};
+
+export const viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
 };
 
 export default function RootLayout({
@@ -58,6 +75,7 @@ export default function RootLayout({
           <QueryProvider>
             <ErrorBoundary>{children}</ErrorBoundary>
           </QueryProvider>
+          <ServiceWorkerRegistration />
         </ThemeProvider>
       </body>
     </html>
