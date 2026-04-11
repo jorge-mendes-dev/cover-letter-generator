@@ -29,10 +29,82 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://coverletter.jorgemendes.com.br";
+
 export const metadata: Metadata = {
-  title: "Cover Letter Generator",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "AI Cover Letter Generator — Free & Instant from Your Resume",
+    template: "%s | Cover Letter Generator",
+  },
   description:
-    "Upload your resume and paste the job description. Get a tailored cover letter in seconds.",
+    "Generate a tailored, professional cover letter in seconds. Upload your PDF résumé, paste the job description, and let AI craft a compelling cover letter — free, no signup required.",
+  keywords: [
+    "cover letter generator",
+    "AI cover letter generator",
+    "free cover letter generator",
+    "cover letter from resume",
+    "automatic cover letter",
+    "cover letter maker",
+    "job application cover letter",
+    "professional cover letter generator",
+    "cover letter AI",
+    "resume cover letter generator",
+    "AI writing tool",
+    "AI tool for job seekers",
+    "AI tools",
+    "free AI tools",
+    "AI job application tool",
+    "AI productivity tool",
+    "LLM cover letter",
+    "Groq AI",
+    "ChatGPT alternative for cover letters",
+    "best AI tools",
+  ],
+  authors: [{ name: "Jorge Mendes", url: "https://jorgemendes.com.br" }],
+  creator: "Jorge Mendes",
+  publisher: "Cover Letter Generator",
+  category: "productivity",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Cover Letter Generator",
+    title: "AI Cover Letter Generator — Free AI Tool, Instant Results",
+    description:
+      "The best free AI tool for cover letters. Upload your PDF résumé, paste any job description, and get a fully tailored cover letter in seconds — powered by Groq LLM, no signup required.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Cover Letter Generator — AI-powered cover letters from your resume",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Cover Letter Generator — Free & Instant",
+    description:
+      "Upload your résumé, paste the job description, get a tailored cover letter in seconds. Powered by AI.",
+    images: ["/og-image.png"],
+    creator: "@jorgemendesdev",
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   appleWebApp: {
     capable: true,
     title: "Cover Letter Generator",
