@@ -1,21 +1,8 @@
 import { createGroq } from "@ai-sdk/groq";
 import { generateObject } from "ai";
 import { NextRequest, NextResponse } from "next/server";
+import { extractText, getDocumentProxy } from "unpdf";
 import { z } from "zod";
-
-// pdf-parse v2 ships a class-based API; require() resolves the CJS build.
-// LoadParameters uses `data: TypedArray | ArrayBuffer` (not `buffer`).
-type PDFParseConstructor = new (opts: { data?: ArrayBuffer | Uint8Array; url?: string }) => {
-  getText: () => Promise<{ text: string }>;
-};
-
-let PDFParse: PDFParseConstructor | undefined;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  ({ PDFParse } = require("pdf-parse") as { PDFParse: PDFParseConstructor });
-} catch (err) {
-  console.error("[module load] pdf-parse failed to load:", err);
-}
 
 // Node.js native fetch (undici) does NOT honour NODE_TLS_REJECT_UNAUTHORIZED at
 // runtime — it must be applied via a custom global dispatcher. This activates
@@ -30,7 +17,7 @@ if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === "0") {
   undici.setGlobalDispatcher(new undici.Agent({ connect: { rejectUnauthorized: false } }));
 }
 
-// Must be Node.js — pdf-parse does not run on the Edge runtime
+// Must be Node.js — unpdf/pdfjs-dist does not run on the Edge runtime
 export const runtime = "nodejs";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -87,20 +74,14 @@ async function parseFormData(
 
 // ── Step 2: Extract plain text from the PDF buffer ─────────────────────────
 async function extractTextFromPdf(file: File): Promise<string | NextResponse> {
-  if (!PDFParse) {
-    return NextResponse.json(
-      { error: "PDF parsing is unavailable. Please try again later." },
-      { status: 500 }
-    );
-  }
   let rawText: string;
   try {
     const arrayBuffer = await file.arrayBuffer();
-    const parser = new PDFParse({ data: new Uint8Array(arrayBuffer) });
-    const result = await parser.getText();
-    rawText = result.text.trim();
+    const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer));
+    const { text } = await extractText(pdf, { mergePages: true });
+    rawText = text.trim();
   } catch (err) {
-    console.error("[extractTextFromPdf] pdf-parse error:", err);
+    console.error("[extractTextFromPdf] unpdf error:", err);
     return NextResponse.json(
       {
         error:
