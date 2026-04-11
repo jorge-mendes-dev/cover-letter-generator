@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { FONT_INTER, SHADOW_INSET } from "./tokens";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function JobDescriptionField({ value, onChange }: Props) {
+  const { t } = useLanguage();
   return (
     <div>
       <label
@@ -22,13 +24,13 @@ export default function JobDescriptionField({ value, onChange }: Props) {
           marginBottom: "10px",
         }}
       >
-        Job Description
+        {t.form.jobDescLabel}
       </label>
       <textarea
         id="job-desc"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Paste the full job description here…"
+        placeholder={t.form.jobDescPlaceholder}
         rows={12}
         style={{
           width: "100%",

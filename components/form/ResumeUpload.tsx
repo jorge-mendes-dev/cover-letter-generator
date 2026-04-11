@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { useRef, useState } from "react";
 import {
   FONT_INTER,
@@ -22,6 +23,7 @@ export default function ResumeUpload({
   onFileReset,
   onError,
 }: Props) {
+  const { t } = useLanguage();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
@@ -32,7 +34,7 @@ export default function ResumeUpload({
       f.type !== "application/pdf" &&
       !f.name.toLowerCase().endsWith(".pdf")
     ) {
-      onError("Only PDF files are supported.");
+      onError(t.form.resumeErrorPdf);
       return;
     }
     onFileAccepted(f);
@@ -65,13 +67,14 @@ export default function ResumeUpload({
           marginBottom: "10px",
         }}
       >
-        Résumé <span style={{ fontWeight: 400 }}>(PDF only)</span>
+        {t.form.resumeLabel}{" "}
+        <span style={{ fontWeight: 400 }}>{t.form.resumeSubLabel}</span>
       </label>
 
       <div
         role="button"
         tabIndex={0}
-        aria-label="Upload resume PDF"
+        aria-label={t.form.resumeAriaLabel}
         onClick={() => fileInputRef.current?.click()}
         onKeyDown={(e) =>
           (e.key === "Enter" || e.key === " ") && fileInputRef.current?.click()
@@ -205,7 +208,7 @@ export default function ResumeUpload({
                 margin: 0,
               }}
             >
-              Drop your PDF here, or{" "}
+              {t.form.resumeDropText}{" "}
               <span
                 style={{
                   color: "var(--ink)",
@@ -213,7 +216,7 @@ export default function ResumeUpload({
                   textUnderlineOffset: "3px",
                 }}
               >
-                click to browse
+                {t.form.resumeBrowseText}
               </span>
             </p>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { FONT_INTER } from "./tokens";
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function SubmitButton({ loading }: Props) {
+  const { t } = useLanguage();
   return (
     <button
       type="submit"
@@ -56,10 +58,10 @@ export default function SubmitButton({ loading }: Props) {
               strokeLinecap="round"
             />
           </svg>
-          Generating…
+          {t.form.submitGenerating}
         </>
       ) : (
-        "Generate Cover Letter"
+        t.form.submitGenerate
       )}
     </button>
   );

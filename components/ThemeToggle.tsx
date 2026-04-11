@@ -1,20 +1,21 @@
 "use client";
 
+import { useLanguage } from "./LanguageProvider";
 import { useTheme } from "./ThemeProvider";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const isDark = theme === "dark";
+
+  const label = isDark ? t.themeToggle.toLight : t.themeToggle.toDark;
 
   return (
     <button
       onClick={toggleTheme}
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={label}
+      title={label}
       style={{
-        position: "absolute",
-        top: "24px",
-        right: "24px",
         width: "38px",
         height: "38px",
         borderRadius: "9999px",

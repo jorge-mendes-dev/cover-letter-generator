@@ -1,4 +1,5 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { LanguageProvider } from "@/components/LanguageProvider";
 import QueryProvider from "@/components/QueryProvider";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -144,10 +145,12 @@ export default function RootLayout({
         }}
       >
         <ThemeProvider>
-          <QueryProvider>
-            <ErrorBoundary>{children}</ErrorBoundary>
-          </QueryProvider>
-          <ServiceWorkerRegistration />
+          <LanguageProvider>
+            <QueryProvider>
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </QueryProvider>
+            <ServiceWorkerRegistration />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

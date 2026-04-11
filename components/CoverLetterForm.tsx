@@ -2,21 +2,25 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "./LanguageProvider";
 import CoverLetterResult from "./form/CoverLetterResult";
 import ErrorBanner from "./form/ErrorBanner";
 import JobDescriptionField from "./form/JobDescriptionField";
 import ResumeUpload from "./form/ResumeUpload";
 import SubmitButton from "./form/SubmitButton";
 
-async function generateCoverLetter(formData: FormData): Promise<string> {
+async function generateCoverLetter(
+  formData: FormData,
+  defaultError: string,
+): Promise<string> {
   const res = await fetch("/api/generate", { method: "POST", body: formData });
   const data = await res.json();
-  if (!res.ok)
-    throw new Error(data.error ?? "Something went wrong. Please try again.");
+  if (!res.ok) throw new Error(data.error ?? defaultError);
   return data.coverLetter as string;
 }
 
 export default function CoverLetterForm() {
+  const { t } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -30,7 +34,8 @@ export default function CoverLetterForm() {
     error: mutationError,
     reset,
   } = useMutation({
-    mutationFn: generateCoverLetter,
+    mutationFn: (formData: FormData) =>
+      generateCoverLetter(formData, t.form.errorDefault),
   });
 
   const error =
@@ -38,7 +43,7 @@ export default function CoverLetterForm() {
     (mutationError instanceof Error
       ? mutationError.message
       : mutationError
-        ? "Something went wrong. Please try again."
+        ? t.form.errorDefault
         : null);
 
   useEffect(() => {
@@ -55,11 +60,11 @@ export default function CoverLetterForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      setValidationError("Please upload your resume as a PDF.");
+      setValidationError(t.form.validationNoResume);
       return;
     }
     if (!jobDescription.trim()) {
-      setValidationError("Please paste the job description.");
+      setValidationError(t.form.validationNoJobDesc);
       return;
     }
     setValidationError(null);

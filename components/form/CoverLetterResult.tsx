@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { useState } from "react";
 import { FONT_INTER, FONT_MONO } from "./tokens";
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function CoverLetterResult({ coverLetter }: Props) {
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
 
@@ -50,7 +52,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
             margin: 0,
           }}
         >
-          Your cover letter
+          {t.form.resultHeading}
         </h3>
 
         {/* Copy — white pill with shadow-as-border */}
@@ -95,7 +97,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
                   strokeLinejoin="round"
                 />
               </svg>
-              Copied
+              {t.form.resultCopied}
             </>
           ) : (
             <>
@@ -110,7 +112,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
                 <rect x="9" y="9" width="13" height="13" rx="2" />
                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
               </svg>
-              Copy
+              {t.form.resultCopy}
             </>
           )}
         </button>
@@ -127,7 +129,7 @@ export default function CoverLetterResult({ coverLetter }: Props) {
             margin: "0 0 12px",
           }}
         >
-          Could not copy — please select the text manually.
+          {t.form.resultCopyFailed}
         </p>
       )}
 
