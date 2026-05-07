@@ -32,16 +32,11 @@ function readInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Always start with "light" to match the server render (avoids hydration
-  // mismatch). CSS @media prefers-color-scheme handles the visual before JS
-  // runs, so there is no FOUC.
+  // Keep first render deterministic with the server output.
   const [theme, setTheme] = useState<Theme>("light");
 
-  // After hydration, sync with the user's stored or OS preference.
-  // Intentional: server always renders "light" to avoid hydration mismatch;
-  // the effect corrects the value on the client in a single extra render.
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(readInitialTheme());
   }, []);
 

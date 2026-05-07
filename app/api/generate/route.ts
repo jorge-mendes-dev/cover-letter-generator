@@ -23,6 +23,155 @@ export const runtime = "nodejs";
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 const MAX_RESUME_CHARS = 8_000; // ~ 2 k tokens — keeps cost low and stays within context
 
+type SupportedLocale = "en" | "es" | "pt-BR";
+
+const GENERIC_NAME_VALUES = new Set([
+  "",
+  "unknown",
+  "candidate",
+  "n/a",
+  "na",
+  "not provided",
+]);
+
+function normalizeCandidateName(name: string | null | undefined): string | null {
+  if (!name) return null;
+  const normalized = name.trim();
+  if (!normalized) return null;
+  return GENERIC_NAME_VALUES.has(normalized.toLowerCase()) ? null : normalized;
+}
+
+function extractCandidateNameFromResume(resumeText: string): string | null {
+  const lines = resumeText
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, 25);
+
+  const titleCaseName =
+    /^[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ'’-]+){1,3}$/;
+  const upperCaseName =
+    /^[A-ZÀ-ÖØ-Ý][A-ZÀ-ÖØ-Ý'’-]+(?:\s+[A-ZÀ-ÖØ-Ý][A-ZÀ-ÖØ-Ý'’-]+){1,3}$/;
+
+  for (const line of lines) {
+    if (
+      line.includes("@") ||
+      /^https?:\/\//i.test(line) ||
+      /linkedin|github|portfolio|curriculum|resume|cv/i.test(line) ||
+      /\d{3,}/.test(line)
+    ) {
+      continue;
+    }
+
+    if (titleCaseName.test(line) || upperCaseName.test(line)) {
+      return line;
+    }
+  }
+
+  return null;
+}
+
+function inferLanguageFromText(
+  text: string,
+  fallback: SupportedLocale = "en"
+): SupportedLocale {
+  const lower = text.toLowerCase();
+  const normalized = lower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const scores: Record<SupportedLocale, number> = {
+    en: 0,
+    es: 0,
+    "pt-BR": 0,
+  };
+
+  const countWord = (source: string, word: string) => {
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matches = source.match(new RegExp(`\\b${escaped}\\b`, "g"));
+    return matches?.length ?? 0;
+  };
+
+  const countFragment = (source: string, fragment: string) => {
+    const escaped = fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matches = source.match(new RegExp(escaped, "g"));
+    return matches?.length ?? 0;
+  };
+
+  const addWord = (language: "es" | "pt-BR", marker: string, weight: number) => {
+    scores[language] += countWord(normalized, marker) * weight;
+  };
+
+  const addFragment = (
+    language: "es" | "pt-BR",
+    marker: string,
+    weight: number
+  ) => {
+    scores[language] += countFragment(normalized, marker) * weight;
+  };
+
+  addWord("pt-BR", "voce", 3);
+  addWord("pt-BR", "seu", 2.4);
+  addWord("pt-BR", "sua", 2.4);
+  addWord("pt-BR", "nao", 2.1);
+  addWord("pt-BR", "com", 1.1);
+  addWord("pt-BR", "vaga", 2.7);
+  addWord("pt-BR", "equipe", 2.7);
+
+  addWord("es", "usted", 3);
+  addWord("es", "su", 1.2);
+  addWord("es", "no", 1);
+  addWord("es", "con", 1.1);
+  addWord("es", "equipo", 2.7);
+  addWord("es", "puesto", 2.7);
+  addWord("es", "vacante", 2.7);
+
+  addWord("pt-BR", "experiencia", 0.6);
+  addWord("es", "experiencia", 0.6);
+  addWord("pt-BR", "trabalho", 0.6);
+  addWord("es", "trabajo", 0.6);
+  addWord("pt-BR", "oportunidade", 0.6);
+  addWord("es", "oportunidad", 0.6);
+  addWord("pt-BR", "para", 0.5);
+  addWord("es", "para", 0.5);
+
+  scores["pt-BR"] += countFragment(lower, "ção") * 1.6;
+  scores["pt-BR"] += countFragment(lower, "ções") * 1.8;
+  scores["pt-BR"] += countWord(lower, "às") * 1.8;
+  scores["pt-BR"] += countWord(lower, "você") * 1.8;
+  scores["pt-BR"] += countWord(lower, "não") * 1.5;
+  scores["pt-BR"] += countFragment(lower, "ã") * 0.8;
+  scores["pt-BR"] += countFragment(lower, "õ") * 0.8;
+  scores["pt-BR"] += countFragment(lower, "ç") * 0.8;
+
+  scores.es += countFragment(lower, "ción") * 1.6;
+  scores.es += countFragment(lower, "ciones") * 1.8;
+  scores.es += countFragment(lower, "ñ") * 1.3;
+
+  addFragment("pt-BR", "cao", 0.7);
+  addFragment("pt-BR", "coes", 0.8);
+  addFragment("es", "cion", 0.7);
+  addFragment("es", "ciones", 0.8);
+
+  const ranking = (Object.entries(scores) as Array<[SupportedLocale, number]>).sort(
+    (a, b) => b[1] - a[1]
+  );
+
+  const [bestLanguage, bestScore] = ranking[0] ?? [fallback, 0];
+  const [, secondScore] = ranking[1] ?? [fallback, 0];
+  const confidenceThreshold = 2.4;
+  if (bestScore < confidenceThreshold) return fallback;
+
+  const tieMargin = 1.1;
+  if (bestScore - secondScore <= tieMargin) return fallback;
+
+  return bestLanguage;
+}
+
+function languageLabel(locale: SupportedLocale): string {
+  if (locale === "pt-BR") return "Portuguese (Brazil)";
+  if (locale === "es") return "Spanish";
+  return "English";
+}
+
 // ── Zod schema for structured AI output ────────────────────────────────────
 const coverLetterSchema = z.object({
   coverLetter: z
@@ -31,6 +180,19 @@ const coverLetterSchema = z.object({
       "A tailored professional cover letter in 3–4 body paragraphs. " +
         "No salutation, address block, date, or sign-off — body text only."
     ),
+  candidateName: z
+    .string()
+    .describe(
+      "Full name of the candidate as it appears on the resume. Use 'Unknown' if not found."
+    ),
+  candidateEmail: z
+    .string()
+    .nullable()
+    .describe("Email address extracted from the resume, or null if not present."),
+  candidatePhone: z
+    .string()
+    .nullable()
+    .describe("Phone number extracted from the resume, or null if not present."),
 });
 
 // ── Step 1: Parse & validate the incoming FormData ─────────────────────────
@@ -119,7 +281,12 @@ async function extractTextFromPdf(file: File): Promise<string | NextResponse> {
 }
 
 // ── Step 3: Build the prompt that goes to the model ────────────────────────
-function buildPrompt(resumeText: string, jobDescription: string) {
+function buildPrompt(
+  resumeText: string,
+  jobDescription: string,
+  targetLanguage: SupportedLocale
+) {
+  const targetLanguageLabel = languageLabel(targetLanguage);
   const system = `You are an experienced resume writer and career coach who specializes in writing strong, tailored, and natural-sounding cover letters.
 
 Write a compelling cover letter based on the candidate’s resume and the job description provided. Aim for approximately 250–350 words total across 3–4 paragraphs.
@@ -137,7 +304,9 @@ If the job description mentions AI, automation, or innovation, incorporate relev
 
 Finish with a confident, forward-looking closing that reinforces the candidate’s fit and interest in contributing. Avoid generic phrases like “I look forward to hearing from you”.
 
-Write in the same language as the job description.
+Write the cover letter entirely in ${targetLanguageLabel}. This is mandatory.
+
+Extract the candidate full name exactly as written in the resume and return it in candidateName. Never use placeholders or generic labels.
 
 Do not include greetings, sign-offs, or placeholders like [Company Name]. Output only plain paragraphs separated by a blank line. No bullet points or headers.
 
@@ -152,18 +321,42 @@ Write in a natural, human tone. Avoid robotic phrasing, clichés, or overly form
 async function generateCoverLetter(
   apiKey: string,
   system: string,
-  prompt: string
-): Promise<{ coverLetter: string } | NextResponse> {
+  prompt: string,
+  targetLanguage: SupportedLocale
+): Promise<{
+  coverLetter: string;
+  candidateName: string;
+  candidateEmail: string | null;
+  candidatePhone: string | null;
+} | NextResponse> {
   const groq = createGroq({ apiKey });
 
   try {
-    const { object } = await generateObject({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
-      schema: coverLetterSchema,
-      system,
-      prompt,
-    });
-    return { coverLetter: object.coverLetter };
+    const generateOnce = async (systemPrompt: string) =>
+      generateObject({
+        model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+        schema: coverLetterSchema,
+        system: systemPrompt,
+        prompt,
+      });
+
+    let { object } = await generateOnce(system);
+    const detectedOutputLanguage = inferLanguageFromText(object.coverLetter);
+
+    if (detectedOutputLanguage !== targetLanguage) {
+      const strictSystem = `${system}\n\nCRITICAL LANGUAGE RULE: The final cover letter must be written 100% in ${languageLabel(
+        targetLanguage
+      )}. Do not switch languages. Do not mix in English.`;
+      const retry = await generateOnce(strictSystem);
+      object = retry.object;
+    }
+
+    return {
+      coverLetter: object.coverLetter,
+      candidateName: object.candidateName,
+      candidateEmail: object.candidateEmail,
+      candidatePhone: object.candidatePhone,
+    };
   } catch (err) {
     console.error("[/api/generate] AI error:", err);
     return NextResponse.json(
@@ -193,6 +386,7 @@ export async function POST(req: NextRequest) {
   const parsed = await parseFormData(req);
   if (parsed instanceof NextResponse) return parsed;
   const { file, resumeText: rawResumeText, jobDescription } = parsed;
+  const targetLanguage = inferLanguageFromText(jobDescription);
 
   // Step 2 — extract text (PDF path) or use pasted text directly
   let resumeText: string;
@@ -209,11 +403,24 @@ export async function POST(req: NextRequest) {
   }
 
   // Step 3 — build the structured prompt
-  const { system, prompt } = buildPrompt(resumeText, jobDescription);
+  const { system, prompt } = buildPrompt(
+    resumeText,
+    jobDescription,
+    targetLanguage
+  );
 
   // Step 4 — call the model and return the result
-  const result = await generateCoverLetter(apiKey, system, prompt);
+  const result = await generateCoverLetter(apiKey, system, prompt, targetLanguage);
   if (result instanceof NextResponse) return result;
 
-  return NextResponse.json(result);
+  const extractedName = extractCandidateNameFromResume(resumeText);
+  const candidateName =
+    normalizeCandidateName(result.candidateName) ?? extractedName ?? "Candidate";
+
+  return NextResponse.json({
+    coverLetter: result.coverLetter,
+    candidateName,
+    candidateEmail: result.candidateEmail ?? undefined,
+    candidatePhone: result.candidatePhone ?? undefined,
+  });
 }

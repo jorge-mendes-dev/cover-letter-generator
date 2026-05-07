@@ -12,11 +12,21 @@ import SubmitButton from "./form/SubmitButton";
 async function generateCoverLetter(
   formData: FormData,
   defaultError: string,
-): Promise<string> {
+): Promise<{
+  coverLetter: string;
+  candidateName: string;
+  candidateEmail?: string;
+  candidatePhone?: string;
+}> {
   const res = await fetch("/api/generate", { method: "POST", body: formData });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error ?? defaultError);
-  return data.coverLetter as string;
+  return {
+    coverLetter: data.coverLetter as string,
+    candidateName: (data.candidateName as string) ?? "Unknown",
+    candidateEmail: data.candidateEmail as string | undefined,
+    candidatePhone: data.candidatePhone as string | undefined,
+  };
 }
 
 export default function CoverLetterForm() {
@@ -33,7 +43,7 @@ export default function CoverLetterForm() {
   const {
     mutate,
     isPending,
-    data: coverLetter,
+    data,
     error: mutationError,
     reset,
   } = useMutation({
@@ -50,7 +60,7 @@ export default function CoverLetterForm() {
         : null);
 
   useEffect(() => {
-    if (coverLetter) {
+    if (data) {
       setTimeout(() => {
         resultRef.current?.scrollIntoView({
           behavior: "smooth",
@@ -58,7 +68,7 @@ export default function CoverLetterForm() {
         });
       }, 150);
     }
-  }, [coverLetter]);
+  }, [data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,11 +141,16 @@ export default function CoverLetterForm() {
         <SubmitButton loading={isPending} />
       </form>
 
-      {coverLetter && (
+      {data ? (
         <div ref={resultRef}>
-          <CoverLetterResult coverLetter={coverLetter} />
+          <CoverLetterResult
+            coverLetter={data.coverLetter}
+            candidateName={data.candidateName}
+            candidateEmail={data.candidateEmail}
+            candidatePhone={data.candidatePhone}
+          />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "cv-generator-v1";
+const CACHE_NAME = "cv-generator-v2";
 
 const PRECACHE_URLS = ["/", "/icons/icon-192x192.png", "/icons/icon-512x512.png"];
 
