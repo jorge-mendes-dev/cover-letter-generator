@@ -12,6 +12,7 @@ interface Props {
   candidateName: string;
   candidateEmail?: string;
   candidatePhone?: string;
+  candidateLinkedin?: string;
 }
 
 export default function CoverLetterResult({
@@ -19,6 +20,7 @@ export default function CoverLetterResult({
   candidateName,
   candidateEmail,
   candidatePhone,
+  candidateLinkedin,
 }: Props) {
   const { locale, t } = useLanguage();
   const [copied, setCopied] = useState(false);
@@ -206,6 +208,7 @@ export default function CoverLetterResult({
         candidateName: resolvedCandidateName,
         candidateEmail,
         candidatePhone,
+        candidateLinkedin,
         salutationText: pdfPhrases.salutationText,
         closingText: pdfPhrases.closingText,
       }) as React.ReactElement;

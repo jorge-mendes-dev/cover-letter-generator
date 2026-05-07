@@ -13,7 +13,6 @@ Automate code review for all modified files, highlighting best practices, streng
 
 1. Identify all modified files in your pull request or commit.
 2. For each file, review the code for:
-
    - Code style and formatting
    - Readability and maintainability
    - Proper use of patterns and best practices

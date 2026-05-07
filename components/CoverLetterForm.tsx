@@ -17,6 +17,7 @@ async function generateCoverLetter(
   candidateName: string;
   candidateEmail?: string;
   candidatePhone?: string;
+  candidateLinkedin?: string;
 }> {
   const res = await fetch("/api/generate", { method: "POST", body: formData });
   const data = await res.json();
@@ -26,6 +27,7 @@ async function generateCoverLetter(
     candidateName: (data.candidateName as string) ?? "Unknown",
     candidateEmail: data.candidateEmail as string | undefined,
     candidatePhone: data.candidatePhone as string | undefined,
+    candidateLinkedin: data.candidateLinkedin as string | undefined,
   };
 }
 
@@ -148,6 +150,7 @@ export default function CoverLetterForm() {
             candidateName={data.candidateName}
             candidateEmail={data.candidateEmail}
             candidatePhone={data.candidatePhone}
+            candidateLinkedin={data.candidateLinkedin}
           />
         </div>
       ) : null}

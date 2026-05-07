@@ -1,10 +1,18 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import {
+  Document,
+  Link,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+} from "@react-pdf/renderer";
 
 export interface CoverLetterDocumentProps {
   coverLetter: string;
   candidateName: string;
   candidateEmail?: string;
   candidatePhone?: string;
+  candidateLinkedin?: string;
   salutationText?: string;
   closingText?: string;
 }
@@ -40,6 +48,12 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: "#777169",
     fontFamily: "Helvetica",
+  },
+  contactLink: {
+    fontSize: 9,
+    color: "#4a6fa5",
+    fontFamily: "Helvetica",
+    textDecoration: "none",
   },
   divider: {
     borderBottomWidth: 0.75,
@@ -87,6 +101,7 @@ export default function CoverLetterDocument({
   candidateName,
   candidateEmail,
   candidatePhone,
+  candidateLinkedin,
   salutationText,
   closingText,
 }: CoverLetterDocumentProps) {
@@ -109,13 +124,25 @@ export default function CoverLetterDocument({
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.name}>{candidateName}</Text>
-            {contactParts.length > 0 && (
+            {(contactParts.length > 0 || candidateLinkedin) && (
               <View style={styles.contactRow}>
                 {contactParts.map((item) => (
                   <Text key={item} style={styles.contactItem}>
                     {item}
                   </Text>
                 ))}
+                {candidateLinkedin && (
+                  <Link
+                    src={
+                      candidateLinkedin.startsWith("http")
+                        ? candidateLinkedin
+                        : `https://${candidateLinkedin}`
+                    }
+                    style={styles.contactLink}
+                  >
+                    {candidateLinkedin}
+                  </Link>
+                )}
               </View>
             )}
           </View>

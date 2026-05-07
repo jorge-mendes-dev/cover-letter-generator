@@ -193,6 +193,10 @@ const coverLetterSchema = z.object({
     .string()
     .nullable()
     .describe("Phone number extracted from the resume, or null if not present."),
+  candidateLinkedin: z
+    .string()
+    .nullable()
+    .describe("LinkedIn profile URL extracted from the resume (e.g. linkedin.com/in/username), or null if not present."),
 });
 
 // ── Step 1: Parse & validate the incoming FormData ─────────────────────────
@@ -328,6 +332,7 @@ async function generateCoverLetter(
   candidateName: string;
   candidateEmail: string | null;
   candidatePhone: string | null;
+  candidateLinkedin: string | null;
 } | NextResponse> {
   const groq = createGroq({ apiKey });
 
@@ -356,6 +361,7 @@ async function generateCoverLetter(
       candidateName: object.candidateName,
       candidateEmail: object.candidateEmail,
       candidatePhone: object.candidatePhone,
+      candidateLinkedin: object.candidateLinkedin,
     };
   } catch (err) {
     console.error("[/api/generate] AI error:", err);
@@ -422,5 +428,6 @@ export async function POST(req: NextRequest) {
     candidateName,
     candidateEmail: result.candidateEmail ?? undefined,
     candidatePhone: result.candidatePhone ?? undefined,
+    candidateLinkedin: result.candidateLinkedin ?? undefined,
   });
 }
