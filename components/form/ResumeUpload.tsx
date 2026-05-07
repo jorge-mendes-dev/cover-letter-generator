@@ -3,6 +3,7 @@
 import { useLanguage } from "@/components/LanguageProvider";
 import { useRef, useState } from "react";
 import {
+  CONTROL_TRANSITION,
   FONT_INTER,
   FONT_MONO,
   SHADOW_INSET,
@@ -70,47 +71,72 @@ export default function ResumeUpload({
       <div
         style={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "space-between",
-          marginBottom: "10px",
+          gap: "16px",
+          marginBottom: "12px",
+          flexWrap: "wrap",
         }}
       >
-        <label
-          htmlFor={
-            inputMode === "upload" ? "resume-file-input" : "resume-text-input"
-          }
+        <div>
+          <label
+            htmlFor={
+              inputMode === "upload" ? "resume-file-input" : "resume-text-input"
+            }
+            style={{
+              display: "block",
+              fontFamily: FONT_INTER,
+              fontSize: "12px",
+              fontWeight: 500,
+              color: "var(--ink-muted)",
+              letterSpacing: "0.14px",
+            }}
+          >
+            {t.form.resumeLabel}
+          </label>
+          <span
+            style={{
+              display: "inline-block",
+              marginTop: "6px",
+              fontFamily: FONT_INTER,
+              fontSize: "12px",
+              color: "var(--ink-secondary)",
+              letterSpacing: "0.14px",
+            }}
+          >
+            {t.form.resumeSubLabel}
+          </span>
+        </div>
+
+        <div
           style={{
-            fontFamily: FONT_INTER,
-            fontSize: "12px",
-            fontWeight: 500,
-            color: "var(--ink-muted)",
-            letterSpacing: "0.14px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "4px",
+            borderRadius: "9999px",
+            background: "var(--surface-warm)",
+            boxShadow: "var(--shadow-warm)",
           }}
         >
-          {t.form.resumeLabel}
-        </label>
-
-        {/* Toggle switch */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <button
             type="button"
             onClick={() => onInputModeChange("upload")}
-            onKeyDown={(e) =>
-              (e.key === "Enter" || e.key === " ") &&
-              onInputModeChange("upload")
-            }
             style={{
               fontFamily: FONT_INTER,
               fontSize: "12px",
               fontWeight: inputMode === "upload" ? 500 : 400,
               color: inputMode === "upload" ? "var(--ink)" : "var(--ink-muted)",
               letterSpacing: "0.14px",
-              transition: "color 0.15s ease",
+              transition: CONTROL_TRANSITION,
               cursor: "pointer",
               userSelect: "none",
-              background: "none",
+              background:
+                inputMode === "upload" ? "var(--surface)" : "transparent",
               border: "none",
-              padding: 0,
+              borderRadius: "9999px",
+              padding: "10px 14px",
+              boxShadow: inputMode === "upload" ? SHADOW_OUTLINE : "none",
             }}
           >
             {t.form.resumeTabUpload}
@@ -118,62 +144,22 @@ export default function ResumeUpload({
 
           <button
             type="button"
-            role="switch"
-            aria-checked={inputMode === "paste"}
-            aria-label="Toggle resume input mode"
-            onClick={() =>
-              onInputModeChange(inputMode === "upload" ? "paste" : "upload")
-            }
-            style={{
-              position: "relative",
-              width: "36px",
-              height: "20px",
-              borderRadius: "9999px",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-              background:
-                inputMode === "paste"
-                  ? "var(--ink-secondary)"
-                  : "var(--border)",
-              transition: "background 0.2s ease",
-              flexShrink: 0,
-            }}
-          >
-            <span
-              style={{
-                position: "absolute",
-                top: "2px",
-                left: inputMode === "paste" ? "18px" : "2px",
-                width: "16px",
-                height: "16px",
-                borderRadius: "9999px",
-                background: "var(--surface)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.35)",
-                transition: "left 0.2s ease",
-                display: "block",
-              }}
-            />
-          </button>
-
-          <button
-            type="button"
             onClick={() => onInputModeChange("paste")}
-            onKeyDown={(e) =>
-              (e.key === "Enter" || e.key === " ") && onInputModeChange("paste")
-            }
             style={{
               fontFamily: FONT_INTER,
               fontSize: "12px",
               fontWeight: inputMode === "paste" ? 500 : 400,
               color: inputMode === "paste" ? "var(--ink)" : "var(--ink-muted)",
               letterSpacing: "0.14px",
-              transition: "color 0.15s ease",
+              transition: CONTROL_TRANSITION,
               cursor: "pointer",
               userSelect: "none",
-              background: "none",
+              background:
+                inputMode === "paste" ? "var(--surface)" : "transparent",
               border: "none",
-              padding: 0,
+              borderRadius: "9999px",
+              padding: "10px 14px",
+              boxShadow: inputMode === "paste" ? SHADOW_OUTLINE : "none",
             }}
           >
             {t.form.resumeTabPaste}
@@ -183,6 +169,7 @@ export default function ResumeUpload({
 
       {inputMode === "upload" ? (
         <div
+          className="interactive-card"
           role="button"
           tabIndex={0}
           aria-label={t.form.resumeAriaLabel}
@@ -204,7 +191,7 @@ export default function ResumeUpload({
           }}
           style={{
             background: file || isDragging ? WARM_STONE : "var(--surface)",
-            borderRadius: "16px",
+            borderRadius: "20px",
             boxShadow:
               file || isDragging
                 ? SHADOW_WARM
@@ -213,7 +200,8 @@ export default function ResumeUpload({
             cursor: "pointer",
             userSelect: "none",
             textAlign: "center",
-            transition: "all 0.2s ease",
+            transition:
+              "background-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out), transform 180ms var(--ease-out)",
           }}
         >
           {file ? (
@@ -260,18 +248,14 @@ export default function ResumeUpload({
                 aria-label="Remove file"
                 style={{
                   color: "var(--ink-muted)",
-                  background: "none",
+                  background: "transparent",
                   border: "none",
                   cursor: "pointer",
                   display: "flex",
-                  padding: "2px",
+                  padding: "6px",
+                  borderRadius: "9999px",
+                  transition: CONTROL_TRANSITION,
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "var(--ink)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "var(--ink-muted)")
-                }
               >
                 <svg
                   width="14"
@@ -320,6 +304,7 @@ export default function ResumeUpload({
                   color: "var(--ink-secondary)",
                   letterSpacing: "0.14px",
                   margin: 0,
+                  lineHeight: 1.7,
                 }}
               >
                 {t.form.resumeDropText}{" "}
@@ -346,35 +331,20 @@ export default function ResumeUpload({
         </div>
       ) : (
         <textarea
+          className="text-input"
           id="resume-text-input"
           value={resumeText}
           onChange={(e) => onResumeTextChange(e.target.value)}
           placeholder={t.form.resumeTextPlaceholder}
           rows={10}
           style={{
-            width: "100%",
             fontFamily: FONT_MONO,
             fontSize: "13px",
             lineHeight: "1.85",
             color: "var(--ink)",
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: "12px",
             padding: "16px",
-            boxShadow: SHADOW_INSET,
             resize: "vertical",
-            outline: "none",
-            boxSizing: "border-box",
             letterSpacing: "0",
-            transition: "box-shadow 0.15s ease, border-color 0.15s ease",
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.boxShadow = "var(--shadow-input-focus)";
-            e.currentTarget.style.borderColor = "var(--border-focus)";
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.boxShadow = SHADOW_INSET;
-            e.currentTarget.style.borderColor = "var(--border)";
           }}
         />
       )}

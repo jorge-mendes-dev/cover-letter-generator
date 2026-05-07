@@ -11,41 +11,24 @@ export default function SubmitButton({ loading }: Props) {
   const { t } = useLanguage();
   return (
     <button
+      className="primary-button"
       type="submit"
       disabled={loading}
       style={{
-        width: "100%",
-        background: loading
-          ? "var(--btn-primary-disabled)"
-          : "var(--btn-primary-bg)",
-        color: "var(--btn-primary-text)",
-        borderRadius: "9999px",
-        padding: "14px 32px",
         fontSize: "15px",
         fontWeight: 500,
         fontFamily: FONT_INTER,
         letterSpacing: "0.15px",
-        border: "none",
-        cursor: loading ? "not-allowed" : "pointer",
-        transition: "background 0.15s ease",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         gap: "10px",
       }}
-      onMouseEnter={(e) => {
-        if (!loading)
-          e.currentTarget.style.background = "var(--btn-primary-hover)";
-      }}
-      onMouseLeave={(e) => {
-        if (!loading)
-          e.currentTarget.style.background = "var(--btn-primary-bg)";
-      }}
     >
       {loading ? (
         <>
           <svg
-            style={{ animation: "spin 1s linear infinite" }}
+            style={{ animation: "spin 0.65s linear infinite" }}
             width="15"
             height="15"
             viewBox="0 0 24 24"

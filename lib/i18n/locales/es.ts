@@ -125,4 +125,7 @@ export const es: Translations = {
     toLight: "Cambiar a modo claro",
     toDark: "Cambiar a modo oscuro",
   },
+  a11y: {
+    skipToContent: "Ir al contenido",
+  },
 };

@@ -125,4 +125,7 @@ export const ptBR: Translations = {
     toLight: "Mudar para modo claro",
     toDark: "Mudar para modo escuro",
   },
+  a11y: {
+    skipToContent: "Ir para o conteúdo",
+  },
 };

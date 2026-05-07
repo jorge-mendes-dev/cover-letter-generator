@@ -26,6 +26,7 @@ export default function LanguageSelector() {
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <button
+        className="floating-control"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -33,25 +34,13 @@ export default function LanguageSelector() {
         style={{
           height: "38px",
           borderRadius: "9999px",
-          background: "var(--surface)",
-          boxShadow: "var(--shadow-button)",
           border: "none",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           gap: "5px",
           padding: "0 12px",
-          color: "var(--ink-secondary)",
-          transition: "color 0.15s ease, box-shadow 0.15s ease",
           flexShrink: 0,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = "var(--ink)";
-          e.currentTarget.style.boxShadow = "var(--shadow-button-hover)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = "var(--ink-secondary)";
-          e.currentTarget.style.boxShadow = "var(--shadow-button)";
         }}
       >
         {/* Globe icon */}
@@ -107,6 +96,7 @@ export default function LanguageSelector() {
 
       {open && (
         <ul
+          className="floating-menu"
           role="listbox"
           aria-label="Select language"
           style={{
@@ -114,10 +104,6 @@ export default function LanguageSelector() {
             top: "calc(100% + 6px)",
             right: 0,
             minWidth: "130px",
-            background: "var(--surface)",
-            borderRadius: "12px",
-            boxShadow:
-              "rgba(0,0,0,0.06) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 1px 2px, rgba(0,0,0,0.08) 0px 8px 24px",
             listStyle: "none",
             padding: "6px",
             margin: 0,
@@ -129,6 +115,7 @@ export default function LanguageSelector() {
             return (
               <li key={loc} role="option" aria-selected={active}>
                 <button
+                  className="surface-button"
                   onClick={() => {
                     setLocale(loc);
                     setOpen(false);
@@ -149,14 +136,8 @@ export default function LanguageSelector() {
                     color: active ? "var(--ink)" : "var(--ink-secondary)",
                     letterSpacing: "0.14px",
                     textAlign: "left",
-                    transition: "background 0.1s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!active) e.currentTarget.style.background = "var(--bg)";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active)
-                      e.currentTarget.style.background = "transparent";
+                    boxShadow: "none",
+                    transform: "none",
                   }}
                 >
                   <span

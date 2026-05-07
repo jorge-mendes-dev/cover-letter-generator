@@ -12,6 +12,7 @@ export default function ThemeToggle() {
 
   return (
     <button
+      className="floating-control"
       onClick={toggleTheme}
       aria-label={label}
       title={label}
@@ -19,24 +20,12 @@ export default function ThemeToggle() {
         width: "38px",
         height: "38px",
         borderRadius: "9999px",
-        background: "var(--surface)",
-        boxShadow: "var(--shadow-button)",
         border: "none",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: "var(--ink-secondary)",
-        transition: "color 0.15s ease, box-shadow 0.15s ease",
         flexShrink: 0,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.color = "var(--ink)";
-        e.currentTarget.style.boxShadow = "var(--shadow-button-hover)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.color = "var(--ink-secondary)";
-        e.currentTarget.style.boxShadow = "var(--shadow-button)";
       }}
     >
       {isDark ? (

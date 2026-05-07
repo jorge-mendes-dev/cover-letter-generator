@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/components/LanguageProvider";
-import { FONT_INTER, SHADOW_INSET } from "./tokens";
+import { FONT_INTER } from "./tokens";
 
 interface Props {
   value: string;
@@ -27,17 +27,13 @@ export default function JobDescriptionField({ value, onChange }: Props) {
         {t.form.jobDescLabel}
       </label>
       <textarea
+        className="text-input"
         id="job-desc"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t.form.jobDescPlaceholder}
         rows={12}
         style={{
-          width: "100%",
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          boxShadow: SHADOW_INSET,
-          borderRadius: "12px",
           padding: "16px 20px",
           fontSize: "15px",
           fontFamily: FONT_INTER,
@@ -45,17 +41,6 @@ export default function JobDescriptionField({ value, onChange }: Props) {
           lineHeight: 1.6,
           letterSpacing: "0.16px",
           resize: "vertical",
-          outline: "none",
-          transition: "box-shadow 0.15s ease, border-color 0.15s ease",
-          boxSizing: "border-box",
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.boxShadow = "var(--shadow-input-focus)";
-          e.currentTarget.style.borderColor = "var(--border-focus)";
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.boxShadow = SHADOW_INSET;
-          e.currentTarget.style.borderColor = "var(--border)";
         }}
       />
     </div>

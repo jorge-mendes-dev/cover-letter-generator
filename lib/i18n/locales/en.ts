@@ -123,6 +123,9 @@ export const en = {
     toLight: "Switch to light mode",
     toDark: "Switch to dark mode",
   },
+  a11y: {
+    skipToContent: "Skip to content",
+  },
 };
 
 export type Translations = typeof en;

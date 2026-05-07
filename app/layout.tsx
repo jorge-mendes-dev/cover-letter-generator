@@ -3,7 +3,7 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import QueryProvider from "@/components/QueryProvider";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -117,8 +117,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
-  themeColor: "#000000",
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f5f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0d0d" },
+  ],
   width: "device-width",
   initialScale: 1,
   minimumScale: 1,
