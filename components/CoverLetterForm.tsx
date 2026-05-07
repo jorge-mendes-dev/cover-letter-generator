@@ -6,7 +6,7 @@ import { useLanguage } from "./LanguageProvider";
 import CoverLetterResult from "./form/CoverLetterResult";
 import ErrorBanner from "./form/ErrorBanner";
 import JobDescriptionField from "./form/JobDescriptionField";
-import ResumeUpload from "./form/ResumeUpload";
+import ResumeUpload, { type ResumeInputMode } from "./form/ResumeUpload";
 import SubmitButton from "./form/SubmitButton";
 
 async function generateCoverLetter(
@@ -22,6 +22,9 @@ async function generateCoverLetter(
 export default function CoverLetterForm() {
   const { t } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
+  const [resumeInputMode, setResumeInputMode] =
+    useState<ResumeInputMode>("upload");
+  const [resumeText, setResumeText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -59,8 +62,12 @@ export default function CoverLetterForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) {
+    if (resumeInputMode === "upload" && !file) {
       setValidationError(t.form.validationNoResume);
+      return;
+    }
+    if (resumeInputMode === "paste" && !resumeText.trim()) {
+      setValidationError(t.form.validationNoResumeText);
       return;
     }
     if (!jobDescription.trim()) {
@@ -70,7 +77,11 @@ export default function CoverLetterForm() {
     setValidationError(null);
     reset();
     const body = new FormData();
-    body.append("resume", file);
+    if (resumeInputMode === "upload" && file) {
+      body.append("resume", file);
+    } else {
+      body.append("resumeText", resumeText.trim());
+    }
     body.append("jobDescription", jobDescription.trim());
     mutate(body);
   };
@@ -94,6 +105,17 @@ export default function CoverLetterForm() {
             reset();
           }}
           onError={setValidationError}
+          inputMode={resumeInputMode}
+          onInputModeChange={(mode) => {
+            setResumeInputMode(mode);
+            setValidationError(null);
+            reset();
+          }}
+          resumeText={resumeText}
+          onResumeTextChange={(text) => {
+            setResumeText(text);
+            if (!text.trim()) reset();
+          }}
         />
 
         <JobDescriptionField

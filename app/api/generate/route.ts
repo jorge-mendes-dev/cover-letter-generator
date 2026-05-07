@@ -36,7 +36,7 @@ const coverLetterSchema = z.object({
 // ── Step 1: Parse & validate the incoming FormData ─────────────────────────
 async function parseFormData(
   req: NextRequest
-): Promise<{ file: File; jobDescription: string } | NextResponse> {
+): Promise<{ file?: File; resumeText?: string; jobDescription: string } | NextResponse> {
   let formData: FormData;
   try {
     formData = await req.formData();
@@ -45,16 +45,24 @@ async function parseFormData(
   }
 
   const file = formData.get("resume");
+  const resumeText = formData.get("resumeText");
   const jobDescription = formData.get("jobDescription");
 
-  if (!(file instanceof File) || file.size === 0) {
-    return NextResponse.json({ error: "Please upload a PDF resume." }, { status: 400 });
-  }
   if (typeof jobDescription !== "string" || !jobDescription.trim()) {
     return NextResponse.json(
       { error: "Please provide the job description." },
       { status: 400 }
     );
+  }
+
+  // Plain-text resume mode
+  if (typeof resumeText === "string" && resumeText.trim()) {
+    return { resumeText: resumeText.trim(), jobDescription: jobDescription.trim() };
+  }
+
+  // PDF upload mode
+  if (!(file instanceof File) || file.size === 0) {
+    return NextResponse.json({ error: "Please upload a PDF resume or paste your resume text." }, { status: 400 });
   }
   if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
     return NextResponse.json(
@@ -184,11 +192,21 @@ export async function POST(req: NextRequest) {
   // Step 1 — parse & validate FormData
   const parsed = await parseFormData(req);
   if (parsed instanceof NextResponse) return parsed;
-  const { file, jobDescription } = parsed;
+  const { file, resumeText: rawResumeText, jobDescription } = parsed;
 
-  // Step 2 — extract text from the uploaded PDF
-  const resumeText = await extractTextFromPdf(file);
-  if (resumeText instanceof NextResponse) return resumeText;
+  // Step 2 — extract text (PDF path) or use pasted text directly
+  let resumeText: string;
+  if (rawResumeText) {
+    resumeText =
+      rawResumeText.length > MAX_RESUME_CHARS
+        ? rawResumeText.slice(0, MAX_RESUME_CHARS) +
+          "\n\n[Note: The resume above was truncated due to length. Only use the information visible above.]"
+        : rawResumeText;
+  } else {
+    const extracted = await extractTextFromPdf(file!);
+    if (extracted instanceof NextResponse) return extracted;
+    resumeText = extracted;
+  }
 
   // Step 3 — build the structured prompt
   const { system, prompt } = buildPrompt(resumeText, jobDescription);

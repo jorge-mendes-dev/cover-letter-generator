@@ -4,17 +4,24 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { useRef, useState } from "react";
 import {
   FONT_INTER,
+  FONT_MONO,
   SHADOW_INSET,
   SHADOW_OUTLINE,
   SHADOW_WARM,
   WARM_STONE,
 } from "./tokens";
 
+export type ResumeInputMode = "upload" | "paste";
+
 interface Props {
   file: File | null;
   onFileAccepted: (f: File) => void;
   onFileReset: () => void;
   onError: (msg: string) => void;
+  inputMode: ResumeInputMode;
+  onInputModeChange: (mode: ResumeInputMode) => void;
+  resumeText: string;
+  onResumeTextChange: (text: string) => void;
 }
 
 export default function ResumeUpload({
@@ -22,6 +29,10 @@ export default function ResumeUpload({
   onFileAccepted,
   onFileReset,
   onError,
+  inputMode,
+  onInputModeChange,
+  resumeText,
+  onResumeTextChange,
 }: Props) {
   const { t } = useLanguage();
   const [isDragging, setIsDragging] = useState(false);
@@ -55,181 +66,318 @@ export default function ResumeUpload({
 
   return (
     <div>
-      <label
-        htmlFor="resume-file-input"
+      {/* Section label + mode switch */}
+      <div
         style={{
-          display: "block",
-          fontFamily: FONT_INTER,
-          fontSize: "12px",
-          fontWeight: 500,
-          color: "var(--ink-muted)",
-          letterSpacing: "0.14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           marginBottom: "10px",
         }}
       >
-        {t.form.resumeLabel}{" "}
-        <span style={{ fontWeight: 400 }}>{t.form.resumeSubLabel}</span>
-      </label>
+        <label
+          htmlFor={
+            inputMode === "upload" ? "resume-file-input" : "resume-text-input"
+          }
+          style={{
+            fontFamily: FONT_INTER,
+            fontSize: "12px",
+            fontWeight: 500,
+            color: "var(--ink-muted)",
+            letterSpacing: "0.14px",
+          }}
+        >
+          {t.form.resumeLabel}
+        </label>
 
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={t.form.resumeAriaLabel}
-        onClick={() => fileInputRef.current?.click()}
-        onKeyDown={(e) =>
-          (e.key === "Enter" || e.key === " ") && fileInputRef.current?.click()
-        }
-        onDrop={handleDrop}
-        onDragEnter={(e) => {
-          e.preventDefault();
-          dragCounter.current++;
-          setIsDragging(true);
-        }}
-        onDragOver={(e) => e.preventDefault()}
-        onDragLeave={() => {
-          dragCounter.current--;
-          if (dragCounter.current === 0) setIsDragging(false);
-        }}
-        style={{
-          background: file || isDragging ? WARM_STONE : "var(--surface)",
-          borderRadius: "16px",
-          boxShadow:
-            file || isDragging
-              ? SHADOW_WARM
-              : `${SHADOW_INSET}, ${SHADOW_OUTLINE}`,
-          padding: "36px 32px",
-          cursor: "pointer",
-          userSelect: "none",
-          textAlign: "center",
-          transition: "all 0.2s ease",
-        }}
-      >
-        {file ? (
-          <div
+        {/* Toggle switch */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button
+            type="button"
+            onClick={() => onInputModeChange("upload")}
+            onKeyDown={(e) =>
+              (e.key === "Enter" || e.key === " ") &&
+              onInputModeChange("upload")
+            }
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "12px",
+              fontFamily: FONT_INTER,
+              fontSize: "12px",
+              fontWeight: inputMode === "upload" ? 500 : 400,
+              color: inputMode === "upload" ? "var(--ink)" : "var(--ink-muted)",
+              letterSpacing: "0.14px",
+              transition: "color 0.15s ease",
+              cursor: "pointer",
+              userSelect: "none",
+              background: "none",
+              border: "none",
+              padding: 0,
             }}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              style={{ color: "var(--ink)" }}
-            >
-              <path
-                d="M20 6L9 17l-5-5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            {t.form.resumeTabUpload}
+          </button>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={inputMode === "paste"}
+            aria-label="Toggle resume input mode"
+            onClick={() =>
+              onInputModeChange(inputMode === "upload" ? "paste" : "upload")
+            }
+            style={{
+              position: "relative",
+              width: "36px",
+              height: "20px",
+              borderRadius: "9999px",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+              background:
+                inputMode === "paste"
+                  ? "var(--ink-secondary)"
+                  : "var(--border)",
+              transition: "background 0.2s ease",
+              flexShrink: 0,
+            }}
+          >
             <span
               style={{
-                fontFamily: FONT_INTER,
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "var(--ink)",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                maxWidth: "320px",
+                position: "absolute",
+                top: "2px",
+                left: inputMode === "paste" ? "18px" : "2px",
+                width: "16px",
+                height: "16px",
+                borderRadius: "9999px",
+                background: "var(--surface)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.35)",
+                transition: "left 0.2s ease",
+                display: "block",
               }}
-            >
-              {file.name}
-            </span>
-            <button
-              type="button"
-              onClick={handleReset}
-              aria-label="Remove file"
+            />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onInputModeChange("paste")}
+            onKeyDown={(e) =>
+              (e.key === "Enter" || e.key === " ") && onInputModeChange("paste")
+            }
+            style={{
+              fontFamily: FONT_INTER,
+              fontSize: "12px",
+              fontWeight: inputMode === "paste" ? 500 : 400,
+              color: inputMode === "paste" ? "var(--ink)" : "var(--ink-muted)",
+              letterSpacing: "0.14px",
+              transition: "color 0.15s ease",
+              cursor: "pointer",
+              userSelect: "none",
+              background: "none",
+              border: "none",
+              padding: 0,
+            }}
+          >
+            {t.form.resumeTabPaste}
+          </button>
+        </div>
+      </div>
+
+      {inputMode === "upload" ? (
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={t.form.resumeAriaLabel}
+          onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) =>
+            (e.key === "Enter" || e.key === " ") &&
+            fileInputRef.current?.click()
+          }
+          onDrop={handleDrop}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            dragCounter.current++;
+            setIsDragging(true);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDragLeave={() => {
+            dragCounter.current--;
+            if (dragCounter.current === 0) setIsDragging(false);
+          }}
+          style={{
+            background: file || isDragging ? WARM_STONE : "var(--surface)",
+            borderRadius: "16px",
+            boxShadow:
+              file || isDragging
+                ? SHADOW_WARM
+                : `${SHADOW_INSET}, ${SHADOW_OUTLINE}`,
+            padding: "36px 32px",
+            cursor: "pointer",
+            userSelect: "none",
+            textAlign: "center",
+            transition: "all 0.2s ease",
+          }}
+        >
+          {file ? (
+            <div
               style={{
-                color: "var(--ink-muted)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
                 display: "flex",
-                padding: "2px",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "12px",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "var(--ink-muted)")
-              }
             >
               <svg
-                width="14"
-                height="14"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
+                style={{ color: "var(--ink)" }}
               >
-                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                <path
+                  d="M20 6L9 17l-5-5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
-            </button>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "12px",
-            }}
-          >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--upload-icon-stroke)"
-              strokeWidth="1.5"
-            >
-              <path
-                d="M12 16V8m0 0l-3.5 3.5M12 8l3.5 3.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <p
-              style={{
-                fontFamily: FONT_INTER,
-                fontSize: "14px",
-                color: "var(--ink-secondary)",
-                letterSpacing: "0.14px",
-                margin: 0,
-              }}
-            >
-              {t.form.resumeDropText}{" "}
               <span
                 style={{
+                  fontFamily: FONT_INTER,
+                  fontSize: "14px",
+                  fontWeight: 500,
                   color: "var(--ink)",
-                  textDecoration: "underline",
-                  textUnderlineOffset: "3px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  maxWidth: "320px",
                 }}
               >
-                {t.form.resumeBrowseText}
+                {file.name}
               </span>
-            </p>
-          </div>
-        )}
-        <input
-          ref={fileInputRef}
-          id="resume-file-input"
-          type="file"
-          accept=".pdf,application/pdf"
-          onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
-          style={{ display: "none" }}
+              <button
+                type="button"
+                onClick={handleReset}
+                aria-label="Remove file"
+                style={{
+                  color: "var(--ink-muted)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  padding: "2px",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "var(--ink)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "var(--ink-muted)")
+                }
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--upload-icon-stroke)"
+                strokeWidth="1.5"
+              >
+                <path
+                  d="M12 16V8m0 0l-3.5 3.5M12 8l3.5 3.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <p
+                style={{
+                  fontFamily: FONT_INTER,
+                  fontSize: "14px",
+                  color: "var(--ink-secondary)",
+                  letterSpacing: "0.14px",
+                  margin: 0,
+                }}
+              >
+                {t.form.resumeDropText}{" "}
+                <span
+                  style={{
+                    color: "var(--ink)",
+                    textDecoration: "underline",
+                    textUnderlineOffset: "3px",
+                  }}
+                >
+                  {t.form.resumeBrowseText}
+                </span>
+              </p>
+            </div>
+          )}
+          <input
+            ref={fileInputRef}
+            id="resume-file-input"
+            type="file"
+            accept=".pdf,application/pdf"
+            onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+            style={{ display: "none" }}
+          />
+        </div>
+      ) : (
+        <textarea
+          id="resume-text-input"
+          value={resumeText}
+          onChange={(e) => onResumeTextChange(e.target.value)}
+          placeholder={t.form.resumeTextPlaceholder}
+          rows={10}
+          style={{
+            width: "100%",
+            fontFamily: FONT_MONO,
+            fontSize: "13px",
+            lineHeight: "1.85",
+            color: "var(--ink)",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "12px",
+            padding: "16px",
+            boxShadow: SHADOW_INSET,
+            resize: "vertical",
+            outline: "none",
+            boxSizing: "border-box",
+            letterSpacing: "0",
+            transition: "box-shadow 0.15s ease, border-color 0.15s ease",
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.boxShadow = "var(--shadow-input-focus)";
+            e.currentTarget.style.borderColor = "var(--border-focus)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.boxShadow = SHADOW_INSET;
+            e.currentTarget.style.borderColor = "var(--border)";
+          }}
         />
-      </div>
+      )}
     </div>
   );
 }
